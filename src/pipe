@@ -1,6 +1,4 @@
 #!/bin/bash
-# history -r ~/.seb_history
-
 self=`basename "$0"`
 
 declare -a inputs
@@ -13,9 +11,16 @@ while read line; do
   input_index=$((input_index + 1))
 done
 
+
+if [ -z "$COMMANDS" ]; then
+  COMMANDS=""
+fi
 read -e -p $'\e[32m>>\e[0m ' response </dev/tty
 if [ ! -z "${response}" ]; then
- #history -s "$response"
- #history -w ~/.seb_history
-  printf '%s\n' "${inputs[@]}" | eval "$response" | $self
+  if [ "${response}" = 'done' ]; then
+    echo $COMMANDS
+  else
+    COMMANDS="$COMMANDS | $response"
+    printf '%s\n' "${inputs[@]}" | eval "$response" | COMMANDS=$COMMANDS $self
+  fi
 fi
